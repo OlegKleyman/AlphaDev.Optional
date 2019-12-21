@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
+using FluentAssertions.Optional.Extensions;
 using Optional;
 using Xunit;
 
@@ -10,14 +11,14 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
         [Fact]
         public void FilterNotNullReturnsNoneWhenOptionContainsNull()
         {
-            ((object?) null).Some().FilterNotNull().Should().Be(Option.None<object>());
+            Option.Some<object?>(null).FilterNotNull().Should().BeNone();
         }
 
         [Fact]
         public void FilterNotNullReturnsSomeWhenOptionDoesNotContainNull()
         {
-            // ReSharper disable once RedundantCast - need to convert to nullable reference type to use extension method
-            ((object?) new object()).Some().FilterNotNull().HasValue.Should().BeTrue();
+            var target = new object();
+            target.Some().FilterNotNull().Should().HaveSome().Which.Should().BeSameAs(target);
         }
 
         [Fact]
