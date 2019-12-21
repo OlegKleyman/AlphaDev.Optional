@@ -59,7 +59,7 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
         }
 
         [Fact]
-        public async Task MatchSomeAsyncExecutesSomeExecutesSomeFunctionWithValueWhenResultHasSome()
+        public async Task MatchSomeAsyncExecutesSomeFunctionWithValueWhenResultHasSome()
         {
             var some = new object();
             var optionTask = Task.FromResult(some.Some().WithException(string.Empty));

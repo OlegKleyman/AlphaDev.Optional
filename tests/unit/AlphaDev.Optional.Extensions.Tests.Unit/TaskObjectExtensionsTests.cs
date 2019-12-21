@@ -6,7 +6,7 @@ using Xunit;
 
 namespace AlphaDev.Optional.Extensions.Tests.Unit
 {
-    public class TaskExtensionsTests
+    public class TaskObjectExtensionsTests
     {
         [Fact]
         public async Task NoneAsyncEitherReturnsNone()

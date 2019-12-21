@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
-using Optional;
+using FluentAssertions.Optional.Extensions;
 using Xunit;
 
 namespace AlphaDev.Optional.Extensions.Tests.Unit
@@ -12,28 +12,28 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
         {
             var option =
                 await new ValueTask<string?>(Task.FromResult(default(string?))).SomeNotNullAsync(() => "exception");
-            option.Should().Be(Option.None<string, string>("exception"));
+            option.Should().BeNone().Which.Should().Be("exception");
         }
 
         [Fact]
         public static async Task SomeNotNullAsyncValueTaskReturnsNoneWhenTargetNull()
         {
             var option = await new ValueTask<object?>(Task.FromResult(default(object?))).SomeNotNullAsync();
-            option.Should().Be(Option.None<object>());
+            option.Should().BeNone();
         }
 
         [Fact]
         public static async Task SomeNotNullAsyncValueTaskReturnsSomeWhenTargetNotNull()
         {
             var option = await new ValueTask<string>(Task.FromResult("test")).SomeNotNullAsync();
-            option.Should().Be("test".Some());
+            option.Should().HaveSome().Which.Should().Be("test");
         }
 
         [Fact]
         public static async Task SomeNotNullAsyncValueTaskWithExceptionReturnsSomeWhenTargetNotNull()
         {
             var option = await new ValueTask<string>(Task.FromResult("test")).SomeNotNullAsync(() => new object());
-            option.Should().Be("test".Some<string, object>());
+            option.Should().HaveSome().Which.Should().Be("test");
         }
     }
 }
