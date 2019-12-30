@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Optional;
 using Optional.Unsafe;
-using AlphaDev.Optional.Extensions.Unsafe;
 
 namespace AlphaDev.Optional.Extensions
 {
