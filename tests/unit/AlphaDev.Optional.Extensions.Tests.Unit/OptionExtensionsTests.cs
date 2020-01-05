@@ -22,6 +22,33 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
         }
 
         [Fact]
+        public async Task FlatMapAsyncReturnsNoneWithInitialExceptionWhenNone()
+        {
+            var result = await Option.None<object?, int>(1)
+                                     .FlatMapAsync(x => Task.FromResult(Option.None<string, byte>(default)),
+                                         x => default);
+            result.Should().BeNone().Which.Should().Be(1);
+        }
+
+        [Fact]
+        public async Task FlatMapAsyncReturnsNoneWithTransformedExceptionWhenSome()
+        {
+            var result = await Option.Some<object?, string?>(default)
+                                     .FlatMapAsync(x => Task.FromResult(Option.None<string, int>(1)),
+                                         x => x.ToString());
+            result.Should().BeNone().Which.Should().Be("1");
+        }
+
+        [Fact]
+        public async Task FlatMapAsyncReturnsTransformedOptionWhenSome()
+        {
+            var result = await Option.Some<int, object?>(1)
+                                     .FlatMapAsync(x => Task.FromResult(Option.Some<string, object>(x.ToString())),
+                                         x => default);
+            result.Should().HaveSome().Which.Should().Be(1.ToString());
+        }
+
+        [Fact]
         public void GetValueOrExceptionReturnsExceptionValueWhenOptionIsNone()
         {
             Option.None<object>().WithException(() => "test").GetValueOrException().Should().Be("test");

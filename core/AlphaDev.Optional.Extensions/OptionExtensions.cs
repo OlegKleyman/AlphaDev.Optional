@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Optional;
+using Optional.Async;
 using Optional.Unsafe;
 
 namespace AlphaDev.Optional.Extensions
@@ -20,6 +21,13 @@ namespace AlphaDev.Optional.Extensions
             {
                 await some(option.ValueOrFailure());
             }
+        }
+
+        public static Task<Option<TResult, TException>> FlatMapAsync<T, TException, TResult, TExceptionResult>(
+            this Option<T, TException> option, Func<T, Task<Option<TResult, TExceptionResult>>> mapping,
+            Func<TExceptionResult, TException> exceptionMapping)
+        {
+            return option.FlatMapAsync(arg => mapping(arg).MapExceptionAsync(exceptionMapping));
         }
     }
 }
