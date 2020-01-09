@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Threading.Tasks;
+using AlphaDev.Optional.Extensions.UtilityExtensions;
 using Optional;
 using Optional.Async;
 using Optional.Unsafe;
@@ -28,6 +30,17 @@ namespace AlphaDev.Optional.Extensions
             Func<TExceptionResult, TException> exceptionMapping)
         {
             return option.FlatMapAsync(arg => mapping(arg).MapExceptionAsync(exceptionMapping));
+        }
+
+        public static Option<T> NotEmpty<T>(this Option<T> option) where T : IEnumerable
+        {
+            return option.Filter(enumerable => enumerable.Any());
+        }
+
+        public static Option<T, TException> NotEmpty<T, TException>(this Option<T, TException> option,
+            Func<TException> exceptionFactory) where T : IEnumerable
+        {
+            return option.Filter(enumerable => enumerable.Any(), exceptionFactory);
         }
     }
 }

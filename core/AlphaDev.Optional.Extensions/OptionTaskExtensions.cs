@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Threading.Tasks;
 using Optional;
 using Optional.Unsafe;
@@ -33,5 +34,12 @@ namespace AlphaDev.Optional.Extensions
 
         public static async Task<T> ValueOrAsync<T, TException>(this Task<Option<T, TException>> option,
             Func<TException, T> exception) => (await option).ValueOr(exception);
+
+        public static async Task<Option<T>> NotEmptyAsync<T>(this Task<Option<T>> task) where T : IEnumerable =>
+            (await task).NotEmpty();
+
+        public static async Task<Option<T, TException>> NotEmptyAsync<T, TException>(
+            this Task<Option<T, TException>> task, Func<TException> exceptionFactory) where T : IEnumerable =>
+            (await task).NotEmpty(exceptionFactory);
     }
 }

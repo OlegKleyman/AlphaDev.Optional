@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
 using FluentAssertions;
 using FluentAssertions.Optional.Extensions;
 using Optional;
@@ -78,6 +80,44 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
             await 1.Some().WithException(() => 2).MatchSomeAsync(i => Task.Run(() => result = i));
 
             result.Should().Be(1);
+        }
+
+        [Fact]
+        public void NotEmptyEitherReturnsNoneWhenEnumerableIsEmpty()
+        {
+            Array.Empty<object>()
+                 .Some()
+                 .WithException(default(int))
+                 .NotEmpty(() => 1)
+                 .Should()
+                 .BeNone()
+                 .Which.Should()
+                 .Be(1);
+        }
+
+        [Fact]
+        public void NotEmptyEitherReturnsSomeWhenEnumerableHasSome()
+        {
+            Enumerable.Range(1, 1)
+                      .Some()
+                      .WithException(default(object))
+                      .NotEmpty(() => default)
+                      .Should()
+                      .HaveSome()
+                      .Which.Should()
+                      .BeEquivalentTo(1);
+        }
+
+        [Fact]
+        public void NotEmptyReturnsNoneWhenEnumerableIsEmpty()
+        {
+            Array.Empty<object>().Some().NotEmpty().Should().BeNone();
+        }
+
+        [Fact]
+        public void NotEmptyReturnsSomeWhenEnumerableHasSome()
+        {
+            Enumerable.Range(1, 1).Some().NotEmpty().Should().HaveSome().Which.Should().BeEquivalentTo(1);
         }
     }
 }
