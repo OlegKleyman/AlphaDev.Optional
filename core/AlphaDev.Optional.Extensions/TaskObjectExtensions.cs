@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Threading.Tasks;
 using Optional;
 
@@ -25,5 +26,16 @@ namespace AlphaDev.Optional.Extensions
 
         public static async Task<Option<T, TException>> NoneAsync<T, TException>(this Task<T> task,
             TException exception) => (await task).None(exception);
+
+        public static async Task<Option<T>> SomeNotEmptyAsync<T>(this Task<T> task, Func<T, IEnumerable> getEnumerable)
+        {
+            return (await task).SomeWhen(arg => getEnumerable(arg).GetEnumerator().MoveNext());
+        }
+
+        public static async Task<Option<T, TException>> SomeNotEmptyAsync<T, TException>(this Task<T> task,
+            Func<T, IEnumerable> getEnumerable, Func<T, TException> exceptionFactory)
+        {
+            return (await task).SomeWhen(arg => getEnumerable(arg).GetEnumerator().MoveNext(), exceptionFactory);
+        }
     }
 }

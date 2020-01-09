@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using FluentAssertions;
+using FluentAssertions.Optional.Extensions;
 using Optional;
 using Xunit;
 
@@ -71,6 +73,36 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
             });
 
             matchSomeValue.Should().Be(some);
+        }
+
+        [Fact]
+        public async Task NotEmptyAsyncEitherReturnsNoneWhenEnumerableIsEmpty()
+        {
+            var result = await Task.FromResult(Array.Empty<object>().Some().WithException(default(int)))
+                                   .NotEmptyAsync(() => 1);
+            result.Should().BeNone().Which.Should().Be(1);
+        }
+
+        [Fact]
+        public async Task NotEmptyAsyncEitherReturnsSomeWhenEnumerableHasSome()
+        {
+            var result = await Task.FromResult(new[] { 1 }.Some().WithException(default(int)))
+                                   .NotEmptyAsync(() => default);
+            result.Should().HaveSome().Which.Should().BeEquivalentTo(1);
+        }
+
+        [Fact]
+        public async Task NotEmptyAsyncReturnsNoneWhenEnumerableIsEmpty()
+        {
+            var result = await Task.FromResult(Array.Empty<object>().Some()).NotEmptyAsync();
+            result.Should().BeNone();
+        }
+
+        [Fact]
+        public async Task NotEmptyAsyncReturnsSomeWhenEnumerableHasSome()
+        {
+            var result = await Task.FromResult(new[] { 1 }.Some()).NotEmptyAsync();
+            result.Should().HaveSome().Which.Should().BeEquivalentTo(1);
         }
 
         [Fact]

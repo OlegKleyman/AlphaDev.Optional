@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
 using FluentAssertions;
 using FluentAssertions.Optional.Extensions;
 using Xunit;
@@ -36,6 +38,42 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
             var target = new object();
             var result = await Task.FromResult(target).SomeAsync();
             result.Should().HaveSome().Which.Should().BeSameAs(target);
+        }
+
+        [Fact]
+        public async Task SomeNotEmptyAsyncEitherReturnsNoneWhenEnumerableIsEmpty()
+        {
+            (await Task.FromResult(1).SomeNotEmptyAsync(arg => Array.Empty<object>(), o => o.ToString()))
+                .Should()
+                .BeNone()
+                .Which.Should()
+                .Be("1");
+        }
+
+        [Fact]
+        public async Task SomeNotEmptyAsyncEitherReturnsSomeWheEnumerableIsNotEmpty()
+        {
+            (await Task.FromResult(1).SomeNotEmptyAsync(i => Enumerable.Repeat(1, 1), i => default(object)))
+                .Should()
+                .HaveSome()
+                .Which.Should()
+                .Be(1);
+        }
+
+        [Fact]
+        public async Task SomeNotEmptyAsyncReturnsNoneWhenEnumerableIsEmpty()
+        {
+            (await Task.FromResult(default(object)).SomeNotEmptyAsync(arg => Array.Empty<object>())).Should().BeNone();
+        }
+
+        [Fact]
+        public async Task SomeNotEmptyAsyncReturnsSomeWheEnumerableIsNotEmpty()
+        {
+            (await Task.FromResult(1).SomeNotEmptyAsync(i => Enumerable.Repeat(1, 1)))
+                .Should()
+                .HaveSome()
+                .Which.Should()
+                .Be(1);
         }
 
         [Fact]
