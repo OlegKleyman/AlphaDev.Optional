@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
+using AlphaDev.Optional.Extensions.Unsafe;
 using FluentAssertions;
-using FluentAssertions.Optional.Extensions;
 using Optional;
+using Optional.Unsafe;
 using Xunit;
 
 namespace AlphaDev.Optional.Extensions.Tests.Unit
@@ -80,7 +81,7 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
         {
             var result = await Task.FromResult(Array.Empty<object>().Some().WithException(default(int)))
                                    .NotEmptyAsync(() => 1);
-            result.Should().BeNone().Which.Should().Be(1);
+            result.ExceptionOrFailure().Should().Be(1);
         }
 
         [Fact]
@@ -88,21 +89,21 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
         {
             var result = await Task.FromResult(new[] { 1 }.Some().WithException(default(int)))
                                    .NotEmptyAsync(() => default);
-            result.Should().HaveSome().Which.Should().BeEquivalentTo(1);
+            result.ValueOrFailure().Should().BeEquivalentTo(1);
         }
 
         [Fact]
         public async Task NotEmptyAsyncReturnsNoneWhenEnumerableIsEmpty()
         {
             var result = await Task.FromResult(Array.Empty<object>().Some()).NotEmptyAsync();
-            result.Should().BeNone();
+            result.HasValue.Should().BeFalse();
         }
 
         [Fact]
         public async Task NotEmptyAsyncReturnsSomeWhenEnumerableHasSome()
         {
             var result = await Task.FromResult(new[] { 1 }.Some()).NotEmptyAsync();
-            result.Should().HaveSome().Which.Should().BeEquivalentTo(1);
+            result.ValueOrFailure().Should().BeEquivalentTo(1);
         }
 
         [Fact]

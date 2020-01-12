@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
+using AlphaDev.Optional.Extensions.Unsafe;
 using FluentAssertions;
-using FluentAssertions.Optional.Extensions;
+using Optional;
+using Optional.Unsafe;
 using Xunit;
 
 namespace AlphaDev.Optional.Extensions.Tests.Unit
@@ -12,9 +14,8 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
         public void SomeNotEmptyEitherReturnsNoneWhenEnumerableIsEmpty()
         {
             1.SomeNotEmpty(arg => Array.Empty<object>(), o => o.ToString())
+             .ExceptionOrFailure()
              .Should()
-             .BeNone()
-             .Which.Should()
              .Be("1");
         }
 
@@ -22,50 +23,48 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
         public void SomeNotEmptyEitherReturnsSomeWheEnumerableIsNotEmpty()
         {
             1.SomeNotEmpty(i => Enumerable.Repeat(1, 1), i => default(object))
+             .ValueOrFailure()
              .Should()
-             .HaveSome()
-             .Which.Should()
              .Be(1);
         }
 
         [Fact]
         public void SomeNotEmptyReturnsNoneWhenEnumerableIsEmpty()
         {
-            default(object).SomeNotEmpty(arg => Array.Empty<object>()).Should().BeNone();
+            default(object).SomeNotEmpty(arg => Array.Empty<object>()).HasValue.Should().BeFalse();
         }
 
         [Fact]
         public void SomeNotEmptyReturnsSomeWheEnumerableIsNotEmpty()
         {
             1.SomeNotEmpty(i => Enumerable.Repeat(1, 1))
+             .ValueOrFailure()
              .Should()
-             .HaveSome()
-             .Which.Should()
              .Be(1);
         }
 
         [Fact]
         public void SomeWhenNotNullReturnNoneWhenObjectIsNull()
         {
-            ((object?) null).SomeWhenNotNull().Should().BeNone();
+            ((object?) null).SomeWhenNotNull().HasValue.Should().BeFalse();
         }
 
         [Fact]
         public void SomeWhenNotNullReturnSomeWhenObjectIsNotNull()
         {
-            "test".SomeWhenNotNull().Should().HaveSome().Which.Should().Be("test");
+            "test".SomeWhenNotNull().ValueOrFailure().Should().Be("test");
         }
 
         [Fact]
         public void SomeWhenNotNullWithExceptionReturnNoneWithExceptionObjectWhenTargetObjectIsNull()
         {
-            ((string?) null).SomeWhenNotNull(() => "exception").Should().BeNone().Which.Should().Be("exception");
+            ((string?) null).SomeWhenNotNull(() => "exception").ExceptionOrFailure().Should().Be("exception");
         }
 
         [Fact]
         public void SomeWhenNotNullWithExceptionReturnSomeWhenTargetObjectIsNotNull()
         {
-            "test".SomeWhenNotNull(() => "exception").Should().HaveSome().Which.Should().Be("test");
+            "test".SomeWhenNotNull(() => "exception").ValueOrException().Should().Be("test");
         }
     }
 }

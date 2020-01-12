@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using AlphaDev.Optional.Extensions.Unsafe;
 using FluentAssertions;
-using FluentAssertions.Optional.Extensions;
+using Optional.Unsafe;
 using Xunit;
 
 namespace AlphaDev.Optional.Extensions.Tests.Unit
@@ -14,14 +15,14 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
         {
             var target = "test";
             var result = await Task.FromResult(default(object)).NoneAsync(target);
-            result.Should().BeNone().Which.Should().BeSameAs(target);
+            result.ExceptionOrFailure().Should().BeSameAs(target);
         }
 
         [Fact]
         public async Task NoneAsyncReturnsSome()
         {
             var result = await Task.FromResult(default(object)).NoneAsync();
-            result.Should().BeNone();
+            result.HasValue.Should().BeFalse();
         }
 
         [Fact]
@@ -29,7 +30,7 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
         {
             var target = new object();
             var result = await Task.FromResult(target).SomeAsync<object, string>();
-            result.Should().HaveSome().Which.Should().BeSameAs(target);
+            result.ValueOrFailure().Should().BeSameAs(target);
         }
 
         [Fact]
@@ -37,16 +38,15 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
         {
             var target = new object();
             var result = await Task.FromResult(target).SomeAsync();
-            result.Should().HaveSome().Which.Should().BeSameAs(target);
+            result.ValueOrFailure().Should().BeSameAs(target);
         }
 
         [Fact]
         public async Task SomeNotEmptyAsyncEitherReturnsNoneWhenEnumerableIsEmpty()
         {
             (await Task.FromResult(1).SomeNotEmptyAsync(arg => Array.Empty<object>(), o => o.ToString()))
+                .ExceptionOrFailure()
                 .Should()
-                .BeNone()
-                .Which.Should()
                 .Be("1");
         }
 
@@ -54,25 +54,25 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
         public async Task SomeNotEmptyAsyncEitherReturnsSomeWheEnumerableIsNotEmpty()
         {
             (await Task.FromResult(1).SomeNotEmptyAsync(i => Enumerable.Repeat(1, 1), i => default(object)))
+                .ValueOrFailure()
                 .Should()
-                .HaveSome()
-                .Which.Should()
                 .Be(1);
         }
 
         [Fact]
         public async Task SomeNotEmptyAsyncReturnsNoneWhenEnumerableIsEmpty()
         {
-            (await Task.FromResult(default(object)).SomeNotEmptyAsync(arg => Array.Empty<object>())).Should().BeNone();
+            (await Task.FromResult(default(object)).SomeNotEmptyAsync(arg => Array.Empty<object>()))
+                .HasValue.Should()
+                .BeFalse();
         }
 
         [Fact]
         public async Task SomeNotEmptyAsyncReturnsSomeWheEnumerableIsNotEmpty()
         {
             (await Task.FromResult(1).SomeNotEmptyAsync(i => Enumerable.Repeat(1, 1)))
+                .ValueOrFailure()
                 .Should()
-                .HaveSome()
-                .Which.Should()
                 .Be(1);
         }
 
@@ -80,14 +80,14 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
         public async Task SomeNotNullAsyncReturnsNoneWhenTaskIsNull()
         {
             var result = await Task.FromResult((string?) null).SomeNotNullAsync();
-            result.Should().BeNone();
+            result.HasValue.Should().BeFalse();
         }
 
         [Fact]
         public async Task SomeNotNullAsyncReturnsSomeWhenTaskIsNotNull()
         {
             var result = await Task.FromResult("test").SomeNotNullAsync();
-            result.Should().HaveSome().Which.Should().Be("test");
+            result.ValueOrFailure().Should().Be("test");
         }
 
         [Fact]
@@ -95,14 +95,14 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
         {
             var exception = new object();
             var result = await Task.FromResult<string?>(null).SomeNotNullAsync(() => exception);
-            result.Should().BeNone().Which.Should().BeSameAs(exception);
+            result.ExceptionOrFailure().Should().BeSameAs(exception);
         }
 
         [Fact]
         public async Task SomeNotNullAsyncWithExceptionReturnsSomeWhenTaskIsNotNull()
         {
             var result = await Task.FromResult("test").SomeNotNullAsync(() => default(object));
-            result.Should().HaveSome().Which.Should().Be("test");
+            result.ValueOrFailure().Should().Be("test");
         }
     }
 }

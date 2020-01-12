@@ -1,6 +1,7 @@
 ﻿using System.Linq;
+using AlphaDev.Optional.Extensions.Unsafe;
 using FluentAssertions;
-using FluentAssertions.Optional.Extensions;
+using Optional.Unsafe;
 using Xunit;
 
 namespace AlphaDev.Optional.Extensions.Tests.Unit
@@ -12,7 +13,7 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
         {
             var exception = new object();
             var result = Enumerable.Empty<int>().SomeNotEmpty(() => exception);
-            result.Should().BeNone().Which.Should().BeSameAs(exception);
+            result.ExceptionOrFailure().Should().BeSameAs(exception);
         }
 
         [Fact]
@@ -20,13 +21,13 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
         {
             var target = new[] { 1 };
             var result = target.SomeNotEmpty(() => new object());
-            result.Should().HaveSome().Which.Should().BeSameAs(target);
+            result.ValueOrFailure().Should().BeSameAs(target);
         }
 
         [Fact]
         public void SomeNotEmptyReturnsNoneWhenEnumerableIsEmpty()
         {
-            Enumerable.Empty<int>().SomeNotEmpty().Should().BeNone();
+            Enumerable.Empty<int>().SomeNotEmpty().HasValue.Should().BeFalse();
         }
 
         [Fact]
@@ -34,7 +35,7 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
         {
             var target = new[] { 1 };
             var result = target.SomeNotEmpty();
-            result.Should().HaveSome().Which.Should().BeSameAs(target);
+            result.ValueOrFailure().Should().BeSameAs(target);
         }
     }
 }
