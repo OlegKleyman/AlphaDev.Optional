@@ -14,7 +14,8 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
         public void SomeNotEmptyEitherReturnsNoneWhenEnumerableIsEmpty()
         {
             1.SomeNotEmpty(arg => Array.Empty<object>(), o => o.ToString())
-             .ExceptionOrFailure().Should()
+             .ExceptionOrFailure()
+             .Should()
              .Be("1");
         }
 
@@ -22,7 +23,8 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
         public void SomeNotEmptyEitherReturnsSomeWheEnumerableIsNotEmpty()
         {
             1.SomeNotEmpty(i => Enumerable.Repeat(1, 1), i => default(object))
-             .ValueOrFailure().Should()
+             .ValueOrFailure()
+             .Should()
              .Be(1);
         }
 
@@ -36,7 +38,8 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
         public void SomeNotEmptyReturnsSomeWheEnumerableIsNotEmpty()
         {
             1.SomeNotEmpty(i => Enumerable.Repeat(1, 1))
-             .ValueOrFailure().Should()
+             .ValueOrFailure()
+             .Should()
              .Be(1);
         }
 

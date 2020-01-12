@@ -90,7 +90,8 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
                  .Some()
                  .WithException(default(int))
                  .NotEmpty(() => 1)
-                 .ExceptionOrFailure().Should()
+                 .ExceptionOrFailure()
+                 .Should()
                  .Be(1);
         }
 
@@ -101,7 +102,8 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
                       .Some()
                       .WithException(default(object))
                       .NotEmpty(() => default)
-                      .ValueOrFailure().Should()
+                      .ValueOrFailure()
+                      .Should()
                       .BeEquivalentTo(1);
         }
 
