@@ -11,7 +11,8 @@ namespace AlphaDev.Optional.Extensions.Unsafe
                 exception => exception);
         }
 
-        public static TException ExceptionOrFailure<TValue, TException>(this Option<TValue, TException> option, Action fail)
+        public static TException ExceptionOrFailure<TValue, TException>(this Option<TValue, TException> option,
+            Action fail)
         {
             return option.Match(value =>
             {
