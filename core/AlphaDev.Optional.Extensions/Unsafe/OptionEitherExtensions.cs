@@ -40,7 +40,8 @@ namespace AlphaDev.Optional.Extensions.Unsafe
             });
         }
 
-        public static TValue ValueOrFailure<TValue, TException>(this Option<TValue, TException> option, Action<TException> fail)
+        public static TValue ValueOrFailure<TValue, TException>(this Option<TValue, TException> option,
+            Action<TException> fail)
         {
             return option.ValueOr(exception =>
             {
