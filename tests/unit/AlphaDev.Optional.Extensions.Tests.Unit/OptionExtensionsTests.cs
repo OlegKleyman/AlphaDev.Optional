@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using AlphaDev.Optional.Extensions.Unsafe;
 using FluentAssertions;
-using FluentAssertions.Optional.Extensions;
 using Optional;
+using Optional.Unsafe;
 using Xunit;
 
 namespace AlphaDev.Optional.Extensions.Tests.Unit
@@ -13,14 +14,14 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
         [Fact]
         public void FilterNotNullReturnsNoneWhenOptionContainsNull()
         {
-            Option.Some<object?>(null).FilterNotNull().Should().BeNone();
+            Option.Some<object?>(null).FilterNotNull().HasValue.Should().BeFalse();
         }
 
         [Fact]
         public void FilterNotNullReturnsSomeWhenOptionDoesNotContainNull()
         {
             var target = new object();
-            target.Some().FilterNotNull().Should().HaveSome().Which.Should().BeSameAs(target);
+            target.Some().FilterNotNull().ValueOrFailure().Should().BeSameAs(target);
         }
 
         [Fact]
@@ -29,7 +30,7 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
             var result = await Option.None<object?, int>(1)
                                      .FlatMapAsync(x => Task.FromResult(Option.None<string, byte>(default)),
                                          x => default);
-            result.Should().BeNone().Which.Should().Be(1);
+            result.ExceptionOrFailure().Should().Be(1);
         }
 
         [Fact]
@@ -38,7 +39,7 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
             var result = await Option.Some<object?, string?>(default)
                                      .FlatMapAsync(x => Task.FromResult(Option.None<string, int>(1)),
                                          x => x.ToString());
-            result.Should().BeNone().Which.Should().Be("1");
+            result.ExceptionOrFailure().Should().Be("1");
         }
 
         [Fact]
@@ -47,7 +48,7 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
             var result = await Option.Some<int, object?>(1)
                                      .FlatMapAsync(x => Task.FromResult(Option.Some<string, object>(x.ToString())),
                                          x => default);
-            result.Should().HaveSome().Which.Should().Be(1.ToString());
+            result.ValueOrFailure().Should().Be(1.ToString());
         }
 
         [Fact]
@@ -89,9 +90,7 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
                  .Some()
                  .WithException(default(int))
                  .NotEmpty(() => 1)
-                 .Should()
-                 .BeNone()
-                 .Which.Should()
+                 .ExceptionOrFailure().Should()
                  .Be(1);
         }
 
@@ -102,22 +101,20 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
                       .Some()
                       .WithException(default(object))
                       .NotEmpty(() => default)
-                      .Should()
-                      .HaveSome()
-                      .Which.Should()
+                      .ValueOrFailure().Should()
                       .BeEquivalentTo(1);
         }
 
         [Fact]
         public void NotEmptyReturnsNoneWhenEnumerableIsEmpty()
         {
-            Array.Empty<object>().Some().NotEmpty().Should().BeNone();
+            Array.Empty<object>().Some().NotEmpty().HasValue.Should().BeFalse();
         }
 
         [Fact]
         public void NotEmptyReturnsSomeWhenEnumerableHasSome()
         {
-            Enumerable.Range(1, 1).Some().NotEmpty().Should().HaveSome().Which.Should().BeEquivalentTo(1);
+            Enumerable.Range(1, 1).Some().NotEmpty().ValueOrFailure().Should().BeEquivalentTo(1);
         }
     }
 }

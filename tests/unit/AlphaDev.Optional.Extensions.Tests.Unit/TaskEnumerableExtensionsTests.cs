@@ -1,7 +1,8 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using AlphaDev.Optional.Extensions.Unsafe;
 using FluentAssertions;
-using FluentAssertions.Optional.Extensions;
+using Optional.Unsafe;
 using Xunit;
 
 namespace AlphaDev.Optional.Extensions.Tests.Unit
@@ -13,7 +14,7 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
         {
             var exception = new object();
             var result = await Task.FromResult(Enumerable.Empty<int>()).SomeNotEmptyAsync(() => exception);
-            result.Should().BeNone().Which.Should().BeSameAs(exception);
+            result.ExceptionOrFailure().Should().BeSameAs(exception);
         }
 
         [Fact]
@@ -21,14 +22,14 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
         {
             var target = new[] { 1 };
             var result = await Task.FromResult(target).SomeNotEmptyAsync(() => new object());
-            result.Should().HaveSome().Which.Should().BeSameAs(target);
+            result.ValueOrFailure().Should().BeSameAs(target);
         }
 
         [Fact]
         public async Task SomeNotEmptyAsyncReturnsNoneWhenEnumerableIsEmpty()
         {
             var result = await Task.FromResult(Enumerable.Empty<int>()).SomeNotEmptyAsync();
-            result.Should().BeNone();
+            result.HasValue.Should().BeFalse();
         }
 
         [Fact]
@@ -36,7 +37,7 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
         {
             var target = new[] { 1 };
             var result = await Task.FromResult(target).SomeNotEmptyAsync();
-            result.Should().HaveSome().Which.Should().BeSameAs(target);
+            result.ValueOrFailure().Should().BeSameAs(target);
         }
     }
 }
