@@ -21,11 +21,31 @@ namespace AlphaDev.Optional.Extensions.Unsafe
             }, exception => exception);
         }
 
+        public static TException ExceptionOrFailure<TValue, TException>(this Option<TValue, TException> option,
+            Action<TValue> fail)
+        {
+            return option.Match(value =>
+            {
+                fail(value);
+                throw new InvalidOperationException("Option has some.");
+            }, exception => exception);
+        }
+
         public static TValue ValueOrFailure<TValue, TException>(this Option<TValue, TException> option, Action fail)
         {
             return option.ValueOr(() =>
             {
                 fail();
+                throw new InvalidOperationException("Option is none.");
+            });
+        }
+
+        public static TValue ValueOrFailure<TValue, TException>(this Option<TValue, TException> option,
+            Action<TException> fail)
+        {
+            return option.ValueOr(exception =>
+            {
+                fail(exception);
                 throw new InvalidOperationException("Option is none.");
             });
         }
