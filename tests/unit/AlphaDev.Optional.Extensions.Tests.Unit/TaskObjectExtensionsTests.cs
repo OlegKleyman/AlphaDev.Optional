@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AlphaDev.Optional.Extensions.Unsafe;
 using FluentAssertions;
+using Optional;
 using Optional.Unsafe;
 using Xunit;
 
@@ -103,6 +104,37 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
         {
             var result = await Task.FromResult("test").SomeNotNullAsync(() => default(object));
             result.ValueOrFailure().Should().Be("test");
+        }
+
+        [Fact]
+        public async Task SomeWhenAsyncEitherReturnsNoneWhenPredicateIsNotTrue()
+        {
+            const int target = 1;
+            var result = await Task.FromResult(target).SomeWhenAsync(x => false, x => x.ToString());
+            result.Should().Be(Option.None<int, string>("1"));
+        }
+
+        [Fact]
+        public async Task SomeWhenAsyncEitherReturnsSomeWhenPredicateIsTrue()
+        {
+            var target = new object();
+            var result = await Task.FromResult(target).SomeWhenAsync(o => true, o => default(object));
+            result.Should().Be(Option.Some<object, object>(target));
+        }
+
+        [Fact]
+        public async Task SomeWhenAsyncMaybeReturnsNoneWhenPredicateIsNotTrue()
+        {
+            var result = await Task.FromResult(default(object)).SomeWhenAsync(o => false);
+            result.Should().Be(Option.None<object>());
+        }
+
+        [Fact]
+        public async Task SomeWhenAsyncMaybeReturnsSomeWhenPredicateIsTrue()
+        {
+            var target = new object();
+            var result = await Task.FromResult(target).SomeWhenAsync(o => true);
+            result.Should().Be(target.Some());
         }
     }
 }
