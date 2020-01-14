@@ -37,5 +37,12 @@ namespace AlphaDev.Optional.Extensions
         {
             return (await task).SomeWhen(arg => getEnumerable(arg).GetEnumerator().MoveNext(), exceptionFactory);
         }
+
+        public static async Task<Option<T>> SomeWhenAsync<T>(this Task<T> task, Func<T, bool> predicate) =>
+            (await task).SomeWhen(predicate);
+
+        public static async Task<Option<T, TException>> SomeWhenAsync<T, TException>(this Task<T> task,
+            Func<T, bool> predicate, Func<T, TException> exceptionFactory) =>
+            (await task).SomeWhen(predicate, exceptionFactory);
     }
 }
