@@ -54,21 +54,70 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
         [Fact]
         public void GetValueOrExceptionReturnsExceptionValueWhenOptionIsNone()
         {
+#pragma warning disable 618 // Obsolete function should still be tested
             Option.None<object>().WithException(() => "test").GetValueOrException().Should().Be("test");
+#pragma warning restore 618
         }
 
         [Fact]
         public void GetValueOrExceptionReturnsSomeValueWhenOptionIsSome()
         {
             var target = new object();
+#pragma warning disable 618 // Obsolete function should still be tested
             target.Some().WithException(() => "test").GetValueOrException().Should().Be(target);
+#pragma warning restore 618
+        }
+
+        [Fact]
+        public void ValueOrExceptionReturnsExceptionValueWhenOptionIsNone()
+        {
+            Option.None<object>().WithException(() => "test").ValueOrException().Should().Be("test");
+        }
+
+        [Fact]
+        public void ValueOrExceptionReturnsSomeValueWhenOptionIsSome()
+        {
+            var target = new object();
+            target.Some().WithException(() => "test").ValueOrException().Should().Be(target);
+        }
+
+        [Fact]
+        public void ExceptionOrValueReturnsExceptionValueWhenOptionIsNone()
+        {
+            var target = new object();
+            Option.None<string>().WithException(() => target).ExceptionOrValue().Should().Be(target);
+        }
+
+        [Fact]
+        public void ExceptionOrValueReturnsSomeValueWhenOptionIsSome()
+        {
+            "test".Some().WithException(() => default(object)).ExceptionOrValue().Should().Be("test");
+        }
+
+        [Fact]
+        public async Task MatchSomeAsyncEitherDoesNotExecutesFuncWhenOptionIsNone()
+        {
+            int? result = null;
+            await Option.None<int, int>(1).MatchSomeAsync(i => Task.Run(() => result = i));
+
+            result.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task MatchSomeAsyncEitherExecutesFuncWhenOptionHasSome()
+        {
+            int? result = null;
+
+            await 1.Some().WithException(() => 2).MatchSomeAsync(i => Task.Run(() => result = i));
+
+            result.Should().Be(1);
         }
 
         [Fact]
         public async Task MatchSomeAsyncDoesNotExecutesFuncWhenOptionIsNone()
         {
             int? result = null;
-            await Option.None<int, int>(1).MatchSomeAsync(i => Task.Run(() => result = i));
+            await Option.None<int>().MatchSomeAsync(i => Task.Run(() => result = i));
 
             result.Should().BeNull();
         }
@@ -78,7 +127,64 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
         {
             int? result = null;
 
-            await 1.Some().WithException(() => 2).MatchSomeAsync(i => Task.Run(() => result = i));
+            await 1.Some().MatchSomeAsync(i => Task.Run(() => result = i));
+
+            result.Should().Be(1);
+        }
+
+        [Fact]
+        public async Task MatchNoneAsyncDoesNotExecutesFuncWhenOptionHasSome()
+        {
+            var executed = false;
+            await default(object).Some().MatchNoneAsync(() =>Task.Run(() => executed = true));
+
+            executed.Should().BeFalse();
+        }
+
+        [Fact]
+        public async Task MatchNoneAsyncExecutesFuncWhenOptionIsNone()
+        {
+            var executed = false;
+            await Option.None<object>().MatchNoneAsync(() => Task.Run(() => executed = true));
+
+            executed.Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task MatchNoneAsyncEitherDoesNotExecutesFuncWhenOptionHasSome()
+        {
+            var executed = false;
+            await default(object).Some().WithException(() => 1).MatchNoneAsync(_ => Task.Run(() => executed = true));
+
+            executed.Should().BeFalse();
+        }
+
+        [Fact]
+        public async Task MatchNoneAsyncEitherExecutesFuncWhenOptionIsNone()
+        {
+            int? exception = null;
+            await Option.None<object, int>(1).MatchNoneAsync(i => Task.Run(() => exception = i));
+
+            exception.Should().Be(1);
+        }
+
+        [Fact]
+        public async Task MatchAsyncExecutesSomeWhenOptionHasSome()
+        {
+            int? result = null;
+            await 1.Some()
+             .WithException(() => default(object))
+             .MatchAsync(i => Task.Run(() => result = i), o => Task.CompletedTask);
+
+            result.Should().Be(1);
+        }
+
+        [Fact]
+        public async Task MatchAsyncExecutesNoneWhenOptionIsNone()
+        {
+            int? result = null;
+            await Option.None<object, int>(1)
+                   .MatchAsync(_ => Task.CompletedTask, i => Task.Run(() => result = i));
 
             result.Should().Be(1);
         }
