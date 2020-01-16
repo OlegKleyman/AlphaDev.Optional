@@ -2,6 +2,7 @@
 using System.Linq;
 using AlphaDev.Optional.Extensions.Unsafe;
 using FluentAssertions;
+using Optional;
 using Optional.Unsafe;
 using Xunit;
 
