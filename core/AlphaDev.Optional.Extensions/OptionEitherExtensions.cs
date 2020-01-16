@@ -7,10 +7,8 @@ using Optional.Async;
 
 namespace AlphaDev.Optional.Extensions
 {
-    public static class OptionExtensions
+    public static class OptionEitherExtensions
     {
-        public static Option<T> FilterNotNull<T>(this Option<T> option) => option.NotNull()!;
-
         [Obsolete("Use ValueOrException instead.")]
         public static T GetValueOrException<T, TException>(this Option<T, TException> option) where TException : T
         {
@@ -32,16 +30,6 @@ namespace AlphaDev.Optional.Extensions
             await option.Map(some).ValueOr(() => Task.CompletedTask);
         }
 
-        public static async Task MatchSomeAsync<T>(this Option<T> option, Func<T, Task> some)
-        {
-            await option.Map(some).ValueOr(() => Task.CompletedTask);
-        }
-
-        public static async Task MatchNoneAsync<T>(this Option<T> option, Func<Task> none)
-        {
-            await option.Map(_ => Task.CompletedTask).ValueOr(none);
-        }
-
         public static async Task MatchNoneAsync<T, TException>(this Option<T, TException> option,
             Func<TException, Task> none)
         {
@@ -59,11 +47,6 @@ namespace AlphaDev.Optional.Extensions
             Func<TExceptionResult, TException> exceptionMapping)
         {
             return option.FlatMapAsync(arg => mapping(arg).MapExceptionAsync(exceptionMapping));
-        }
-
-        public static Option<T> NotEmpty<T>(this Option<T> option) where T : IEnumerable
-        {
-            return option.Filter(enumerable => enumerable.Any());
         }
 
         public static Option<T, TException> NotEmpty<T, TException>(this Option<T, TException> option,

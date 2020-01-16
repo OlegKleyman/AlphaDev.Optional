@@ -9,7 +9,7 @@ using Xunit;
 
 namespace AlphaDev.Optional.Extensions.Tests.Unit
 {
-    public class OptionExtensionsTests
+    public class OptionEitherExtensionsTests
     {
         [Fact]
         public void ExceptionOrValueReturnsExceptionValueWhenOptionIsNone()
@@ -22,19 +22,6 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
         public void ExceptionOrValueReturnsSomeValueWhenOptionIsSome()
         {
             "test".Some().WithException(() => default(object)).ExceptionOrValue().Should().Be("test");
-        }
-
-        [Fact]
-        public void FilterNotNullReturnsNoneWhenOptionContainsNull()
-        {
-            Option.Some<object?>(null).FilterNotNull().HasValue.Should().BeFalse();
-        }
-
-        [Fact]
-        public void FilterNotNullReturnsSomeWhenOptionDoesNotContainNull()
-        {
-            var target = new object();
-            target.Some().FilterNotNull().ValueOrFailure().Should().BeSameAs(target);
         }
 
         [Fact]
@@ -106,22 +93,13 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
         public async Task MatchNoneAsyncDoesNotExecutesFuncWhenOptionHasSome()
         {
             var executed = false;
-            await default(object).Some().MatchNoneAsync(() => Task.Run(() => executed = true));
-
-            executed.Should().BeFalse();
-        }
-
-        [Fact]
-        public async Task MatchNoneAsyncEitherDoesNotExecutesFuncWhenOptionHasSome()
-        {
-            var executed = false;
             await default(object).Some().WithException(() => 1).MatchNoneAsync(_ => Task.Run(() => executed = true));
 
             executed.Should().BeFalse();
         }
 
         [Fact]
-        public async Task MatchNoneAsyncEitherExecutesFuncWhenOptionIsNone()
+        public async Task MatchNoneAsyncExecutesFuncWhenOptionIsNone()
         {
             int? exception = null;
             await Option.None<object, int>(1).MatchNoneAsync(i => Task.Run(() => exception = i));
@@ -130,25 +108,7 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
         }
 
         [Fact]
-        public async Task MatchNoneAsyncExecutesFuncWhenOptionIsNone()
-        {
-            var executed = false;
-            await Option.None<object>().MatchNoneAsync(() => Task.Run(() => executed = true));
-
-            executed.Should().BeTrue();
-        }
-
-        [Fact]
         public async Task MatchSomeAsyncDoesNotExecutesFuncWhenOptionIsNone()
-        {
-            int? result = null;
-            await Option.None<int>().MatchSomeAsync(i => Task.Run(() => result = i));
-
-            result.Should().BeNull();
-        }
-
-        [Fact]
-        public async Task MatchSomeAsyncEitherDoesNotExecutesFuncWhenOptionIsNone()
         {
             int? result = null;
             await Option.None<int, int>(1).MatchSomeAsync(i => Task.Run(() => result = i));
@@ -157,7 +117,7 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
         }
 
         [Fact]
-        public async Task MatchSomeAsyncEitherExecutesFuncWhenOptionHasSome()
+        public async Task MatchSomeAsyncExecutesFuncWhenOptionHasSome()
         {
             int? result = null;
 
@@ -167,17 +127,7 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
         }
 
         [Fact]
-        public async Task MatchSomeAsyncExecutesFuncWhenOptionHasSome()
-        {
-            int? result = null;
-
-            await 1.Some().MatchSomeAsync(i => Task.Run(() => result = i));
-
-            result.Should().Be(1);
-        }
-
-        [Fact]
-        public void NotEmptyEitherReturnsNoneWhenEnumerableIsEmpty()
+        public void NotEmptyReturnsNoneWhenEnumerableIsEmpty()
         {
             Array.Empty<object>()
                  .Some()
@@ -189,7 +139,7 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
         }
 
         [Fact]
-        public void NotEmptyEitherReturnsSomeWhenEnumerableHasSome()
+        public void NotEmptyReturnsSomeWhenEnumerableHasSome()
         {
             Enumerable.Range(1, 1)
                       .Some()
@@ -198,18 +148,6 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
                       .ValueOrFailure()
                       .Should()
                       .BeEquivalentTo(1);
-        }
-
-        [Fact]
-        public void NotEmptyReturnsNoneWhenEnumerableIsEmpty()
-        {
-            Array.Empty<object>().Some().NotEmpty().HasValue.Should().BeFalse();
-        }
-
-        [Fact]
-        public void NotEmptyReturnsSomeWhenEnumerableHasSome()
-        {
-            Enumerable.Range(1, 1).Some().NotEmpty().ValueOrFailure().Should().BeEquivalentTo(1);
         }
 
         [Fact]
