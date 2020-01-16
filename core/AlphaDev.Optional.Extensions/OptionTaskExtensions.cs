@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Optional;
-using Optional.Async;
-using Optional.Unsafe;
 
 namespace AlphaDev.Optional.Extensions
 {
@@ -32,10 +29,11 @@ namespace AlphaDev.Optional.Extensions
             return (await option).ValueOr(x => x);
         }
 
-        public static async Task<TException> ExceptionOrValueAsync<T, TException>(this Task<Option<T, TException>> option)
+        public static async Task<TException> ExceptionOrValueAsync<T, TException>(
+            this Task<Option<T, TException>> option)
             where T : TException
         {
-            return (await option).Map(value => (TException)value).ValueOr(exception => exception);
+            return (await option).Map(value => (TException) value).ValueOr(exception => exception);
         }
 
         public static async Task<T> ValueOrAsync<T, TException>(this Task<Option<T, TException>> option,
@@ -77,10 +75,11 @@ namespace AlphaDev.Optional.Extensions
             await (await task).MatchNoneAsync(none);
         }
 
-        public static async Task MatchNoneAsync<T, TException>(this Task<Option<T, TException>> task, Action<TException> none) =>
-            (await task).MatchNone(none);
+        public static async Task MatchNoneAsync<T, TException>(this Task<Option<T, TException>> task,
+            Action<TException> none) => (await task).MatchNone(none);
 
-        public static async Task MatchNoneAsync<T, TException>(this Task<Option<T, TException>> task, Func<TException, Task> none)
+        public static async Task MatchNoneAsync<T, TException>(this Task<Option<T, TException>> task,
+            Func<TException, Task> none)
         {
             await (await task).MatchNoneAsync(none);
         }

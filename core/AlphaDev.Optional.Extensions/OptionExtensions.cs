@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using AlphaDev.Optional.Extensions.UtilityExtensions;
 using Optional;
 using Optional.Async;
-using Optional.Unsafe;
 
 namespace AlphaDev.Optional.Extensions
 {
@@ -43,7 +42,8 @@ namespace AlphaDev.Optional.Extensions
             await option.Map(_ => Task.CompletedTask).ValueOr(none);
         }
 
-        public static async Task MatchNoneAsync<T, TException>(this Option<T, TException> option, Func<TException, Task> none)
+        public static async Task MatchNoneAsync<T, TException>(this Option<T, TException> option,
+            Func<TException, Task> none)
         {
             await option.Map(_ => Task.CompletedTask).ValueOr(none);
         }
