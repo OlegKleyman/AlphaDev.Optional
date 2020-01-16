@@ -10,36 +10,6 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
     public class OptionMaybeTaskExtensionsTests
     {
         [Fact]
-        public async Task NotEmptyAsyncReturnsNoneWhenEnumerableIsEmpty()
-        {
-            var result = await Task.FromResult(Array.Empty<object>().Some()).NotEmptyAsync();
-            result.HasValue.Should().BeFalse();
-        }
-
-        [Fact]
-        public async Task NotEmptyAsyncReturnsSomeWhenEnumerableHasSome()
-        {
-            var result = await Task.FromResult(new[] { 1 }.Some()).NotEmptyAsync();
-            result.ValueOrFailure().Should().BeEquivalentTo(1);
-        }
-
-        [Fact]
-        public static async Task MatchAsyncReturnsNoneValueWhenOptionIsNone()
-        {
-            var result = await Task.FromResult(Option.None<object>())
-                                   .MatchAsync(i => String.Empty, () => "1");
-            result.Should().Be("1");
-        }
-
-        [Fact]
-        public static async Task MatchAsyncReturnsSomeWhenOptionHasSome()
-        {
-            var result = await Task.FromResult(1.Some())
-                                   .MatchAsync(i => i.ToString(), () => String.Empty);
-            result.Should().Be("1");
-        }
-
-        [Fact]
         public static async Task MatchAsyncExecutesNoneActionWhenOptionIsNone()
         {
             var executedResult = false;
@@ -58,35 +28,19 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
         }
 
         [Fact]
-        public async Task MatchSomeAsyncActionDoesNotExecuteSomeWhenOptionIsNone()
+        public static async Task MatchAsyncReturnsNoneValueWhenOptionIsNone()
         {
-            int? result = null;
-            await Task.FromResult(Option.None<int>()).MatchSomeAsync(i => result = i);
-            result.Should().NotHaveValue();
+            var result = await Task.FromResult(Option.None<object>())
+                                   .MatchAsync(i => string.Empty, () => "1");
+            result.Should().Be("1");
         }
 
         [Fact]
-        public async Task MatchSomeAsyncActionExecutesSomeTaskWhenOptionHasSome()
+        public static async Task MatchAsyncReturnsSomeWhenOptionHasSome()
         {
-            int? value = null;
-            await Task.FromResult(1.Some()).MatchSomeAsync(i => Task.Run(() => value = i));
-            value.Should().Be(1);
-        }
-
-        [Fact]
-        public async Task MatchSomeAsyncActionDoesNotExecuteSomeTaskWhenOptionIsNone()
-        {
-            int? result = null;
-            await Task.FromResult(Option.None<int>()).MatchSomeAsync(i => Task.Run(() => result = i));
-            result.Should().NotHaveValue();
-        }
-
-        [Fact]
-        public async Task MatchSomeAsyncActionExecutesSomeWhenOptionHasSome()
-        {
-            int? result = null;
-            await Task.FromResult(1.Some()).MatchSomeAsync(i => result = i);
-            result.Should().Be(1);
+            var result = await Task.FromResult(1.Some())
+                                   .MatchAsync(i => i.ToString(), () => string.Empty);
+            result.Should().Be("1");
         }
 
         [Fact]
@@ -119,6 +73,52 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
             var executed = false;
             await Task.FromResult(Option.None<int>()).MatchNoneAsync(() => executed = true);
             executed.Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task MatchSomeAsyncActionDoesNotExecuteSomeTaskWhenOptionIsNone()
+        {
+            int? result = null;
+            await Task.FromResult(Option.None<int>()).MatchSomeAsync(i => Task.Run(() => result = i));
+            result.Should().NotHaveValue();
+        }
+
+        [Fact]
+        public async Task MatchSomeAsyncActionDoesNotExecuteSomeWhenOptionIsNone()
+        {
+            int? result = null;
+            await Task.FromResult(Option.None<int>()).MatchSomeAsync(i => result = i);
+            result.Should().NotHaveValue();
+        }
+
+        [Fact]
+        public async Task MatchSomeAsyncActionExecutesSomeTaskWhenOptionHasSome()
+        {
+            int? value = null;
+            await Task.FromResult(1.Some()).MatchSomeAsync(i => Task.Run(() => value = i));
+            value.Should().Be(1);
+        }
+
+        [Fact]
+        public async Task MatchSomeAsyncActionExecutesSomeWhenOptionHasSome()
+        {
+            int? result = null;
+            await Task.FromResult(1.Some()).MatchSomeAsync(i => result = i);
+            result.Should().Be(1);
+        }
+
+        [Fact]
+        public async Task NotEmptyAsyncReturnsNoneWhenEnumerableIsEmpty()
+        {
+            var result = await Task.FromResult(Array.Empty<object>().Some()).NotEmptyAsync();
+            result.HasValue.Should().BeFalse();
+        }
+
+        [Fact]
+        public async Task NotEmptyAsyncReturnsSomeWhenEnumerableHasSome()
+        {
+            var result = await Task.FromResult(new[] { 1 }.Some()).NotEmptyAsync();
+            result.ValueOrFailure().Should().BeEquivalentTo(1);
         }
     }
 }

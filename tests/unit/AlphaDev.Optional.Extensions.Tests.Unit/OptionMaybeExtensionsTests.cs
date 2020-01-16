@@ -24,6 +24,24 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
         }
 
         [Fact]
+        public async Task MatchNoneAsyncDoesNotExecutesFuncWhenOptionHasSome()
+        {
+            var executed = false;
+            await default(object).Some().MatchNoneAsync(() => Task.Run(() => executed = true));
+
+            executed.Should().BeFalse();
+        }
+
+        [Fact]
+        public async Task MatchNoneAsyncExecutesFuncWhenOptionIsNone()
+        {
+            var executed = false;
+            await Option.None<object>().MatchNoneAsync(() => Task.Run(() => executed = true));
+
+            executed.Should().BeTrue();
+        }
+
+        [Fact]
         public async Task MatchSomeAsyncDoesNotExecutesFuncWhenOptionIsNone()
         {
             int? result = null;
@@ -40,24 +58,6 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
             await 1.Some().MatchSomeAsync(i => Task.Run(() => result = i));
 
             result.Should().Be(1);
-        }
-
-        [Fact]
-        public async Task MatchNoneAsyncDoesNotExecutesFuncWhenOptionHasSome()
-        {
-            var executed = false;
-            await default(object).Some().MatchNoneAsync(() => Task.Run(() => executed = true));
-
-            executed.Should().BeFalse();
-        }
-
-        [Fact]
-        public async Task MatchNoneAsyncExecutesFuncWhenOptionIsNone()
-        {
-            var executed = false;
-            await Option.None<object>().MatchNoneAsync(() => Task.Run(() => executed = true));
-
-            executed.Should().BeTrue();
         }
 
         [Fact]
