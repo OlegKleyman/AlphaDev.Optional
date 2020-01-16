@@ -54,18 +54,14 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
         [Fact]
         public void GetValueOrExceptionReturnsExceptionValueWhenOptionIsNone()
         {
-#pragma warning disable 618 // Obsolete function should still be tested
             Option.None<object>().WithException(() => "test").GetValueOrException().Should().Be("test");
-#pragma warning restore 618
         }
 
         [Fact]
         public void GetValueOrExceptionReturnsSomeValueWhenOptionIsSome()
         {
             var target = new object();
-#pragma warning disable 618 // Obsolete function should still be tested
             target.Some().WithException(() => "test").GetValueOrException().Should().Be(target);
-#pragma warning restore 618
         }
 
         [Fact]
@@ -148,19 +144,6 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
                       .ValueOrFailure()
                       .Should()
                       .BeEquivalentTo(1);
-        }
-
-        [Fact]
-        public void ValueOrExceptionReturnsExceptionValueWhenOptionIsNone()
-        {
-            Option.None<object>().WithException(() => "test").ValueOrException().Should().Be("test");
-        }
-
-        [Fact]
-        public void ValueOrExceptionReturnsSomeValueWhenOptionIsSome()
-        {
-            var target = new object();
-            target.Some().WithException(() => "test").ValueOrException().Should().Be(target);
         }
     }
 }

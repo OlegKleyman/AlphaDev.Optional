@@ -9,13 +9,7 @@ namespace AlphaDev.Optional.Extensions
 {
     public static class OptionEitherExtensions
     {
-        [Obsolete("Use ValueOrException instead.")]
         public static T GetValueOrException<T, TException>(this Option<T, TException> option) where TException : T
-        {
-            return option.ValueOr(x => x);
-        }
-
-        public static T ValueOrException<T, TException>(this Option<T, TException> option) where TException : T
         {
             return option.ValueOr(x => x);
         }
