@@ -136,5 +136,21 @@ namespace AlphaDev.Optional.Extensions.Tests.Unit
             var result = await Task.FromResult(target).SomeWhenAsync(o => true);
             result.Should().Be(target.Some());
         }
+
+        [Fact]
+        public async Task SomeWhenExceptionAsyncReturnsNoneWhenPredicateIsFalse()
+        {
+            var result = await Task.FromResult(default(object))
+                                   .SomeWhenExceptionAsync(i => false, i => Task.FromResult(5));
+            result.ExceptionOrFailure().Should().Be(5);
+        }
+
+        [Fact]
+        public async Task SomeWhenExceptionAsyncReturnsSomeWhenPredicateIsTrue()
+        {
+            var result = await Task.FromResult(1)
+                                   .SomeWhenExceptionAsync(i => true, i => Task.FromResult(default(object)));
+            result.ValueOrFailure().Should().Be(1);
+        }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Threading.Tasks;
 using Optional;
+using Optional.Async;
 
 namespace AlphaDev.Optional.Extensions
 {
@@ -16,7 +17,6 @@ namespace AlphaDev.Optional.Extensions
 
         public static async Task<Option<T, TException>> SomeAsync<T, TException>(this Task<T> task) =>
             (await task).Some<T, TException>();
-
 
         public static Task<Option<T>> NoneAsync<T>(
 #pragma warning disable IDE0060 // Remove unused parameter - this is purposely unused for a convenience method
@@ -44,5 +44,11 @@ namespace AlphaDev.Optional.Extensions
         public static async Task<Option<T, TException>> SomeWhenAsync<T, TException>(this Task<T> task,
             Func<T, bool> predicate, Func<T, TException> exceptionFactory) =>
             (await task).SomeWhen(predicate, exceptionFactory);
+
+        public static async Task<Option<T, TException>> SomeWhenExceptionAsync<T, TException>(this Task<T> task,
+            Func<T, bool> predicate, Func<T, Task<TException>> exceptionFactory)
+        {
+            return await task.SomeWhenAsync(predicate, exceptionFactory).MapExceptionAsync(t => t);
+        }
     }
 }
